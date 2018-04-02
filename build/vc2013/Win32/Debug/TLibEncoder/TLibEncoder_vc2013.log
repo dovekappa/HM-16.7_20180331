@@ -1,0 +1,38 @@
+﻿Build started 2018/4/1 17:04:40.
+     1>Project "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\vc2013\TLibEncoder_vc2013.vcxproj" on node 2 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /I"C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\..\source\Lib\\" /Zi /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _LIB /D _CRT_SECURE_NO_WARNINGS /D _MBCS /Gm /EHsc /RTC1 /MTd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\Win32\Debug\TLibEncoder\\" /Fd"C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\Win32\Debug\TLibEncoder\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt ..\..\source\Lib\TLibEncoder\SEIEncoder.cpp ..\..\source\Lib\TLibEncoder\TEncCu.cpp ..\..\source\Lib\TLibEncoder\TEncGOP.cpp ..\..\source\Lib\TLibEncoder\TEncSbac.cpp ..\..\source\Lib\TLibEncoder\TEncSearch.cpp ..\..\source\Lib\TLibEncoder\TEncSlice.cpp ..\..\source\Lib\TLibEncoder\TEncTop.cpp
+         TEncTop.cpp
+         TEncSlice.cpp
+         TEncSearch.cpp
+         TEncSbac.cpp
+         TEncGOP.cpp
+         TEncCu.cpp
+         SEIEncoder.cpp
+         Generating Code...
+       Lib:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\Lib.exe /OUT:"C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\Win32\Debug\TLibEncoder\TLibEncoder.lib" /NOLOGO "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\Win32\Debug\TLibEncoder\NALwrite.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\Win32\Debug\TLibEncoder\SEIEncoder.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\Win32\Debug\TLibEncoder\SEIwrite.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\Win32\Debug\TLibEncoder\SyntaxElementWriter.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\Win32\Debug\TLibEncoder\TEncBinCoderCABAC.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\Win32\Debug\TLibEncoder\TEncBinCoderCABACCounter.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\Win32\Debug\TLibEncoder\TEncCavlc.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\Win32\Debug\TLibEncoder\TEncCu.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\Win32\Debug\TLibEncoder\TEncEntropy.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\Win32\Debug\TLibEncoder\TEncGOP.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\Win32\Debug\TLibEncoder\TEncPic.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\Win32\Debug\TLibEncoder\TEncPreanalyzer.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\Win32\Debug\TLibEncoder\TEncRateCtrl.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\Win32\Debug\TLibEncoder\TEncSampleAdaptiveOffset.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\Win32\Debug\TLibEncoder\TEncSbac.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\Win32\Debug\TLibEncoder\TEncSearch.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\Win32\Debug\TLibEncoder\TEncSlice.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\Win32\Debug\TLibEncoder\TEncTop.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\Win32\Debug\TLibEncoder\WeightPredAnalysis.obj"
+         TLibEncoder_vc2013.vcxproj -> C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\Win32\Debug\TLibEncoder\TLibEncoder.lib
+     1>Done Building Project "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\vc2013\TLibEncoder_vc2013.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:08.93

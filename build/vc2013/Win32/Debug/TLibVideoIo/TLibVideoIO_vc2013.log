@@ -1,0 +1,13 @@
+﻿Build started 2018/4/1 14:32:53.
+     1>Project "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\vc2013\TLibVideoIO_vc2013.vcxproj" on node 6 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /I"C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\..\source\Lib\\" /Zi /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _LIB /D _CRT_SECURE_NO_WARNINGS /D _MBCS /Gm /EHsc /RTC1 /MTd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\Win32\Debug\TLibVideoIo\\" /Fd"C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\Win32\Debug\TLibVideoIo\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt ..\..\source\Lib\TLibVideoIO\TVideoIOYuv.cpp
+         TVideoIOYuv.cpp
+       Lib:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\Lib.exe /OUT:"C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\Win32\Debug\TLibVideoIo\TLibVideoIO.lib" /NOLOGO "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\Win32\Debug\TLibVideoIo\TVideoIOYuv.obj"
+         TLibVideoIO_vc2013.vcxproj -> C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\Win32\Debug\TLibVideoIo\TLibVideoIO.lib
+     1>Done Building Project "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\vc2013\TLibVideoIO_vc2013.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:01.62
