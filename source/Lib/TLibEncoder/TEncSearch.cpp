@@ -2568,6 +2568,401 @@ TEncSearch::estIntraPredLumaQT(TComDataCU* pcCU,
 
 
 
+//李奕霄增加20180401
+Void
+TEncSearch::estIntraPredLumaPlanar(TComDataCU* pcCU,
+                                   TComYuv*    pcOrgYuv,
+                                   TComYuv*    pcPredYuv,
+                                   TComYuv*    pcResiYuv,
+                                   TComYuv*    pcRecoYuv,
+                                   Pel         resiLuma[NUMBER_OF_STORED_RESIDUAL_TYPES][MAX_CU_SIZE * MAX_CU_SIZE]
+                                   DEBUG_STRING_FN_DECLARE(sDebug))
+{
+	const UInt         uiDepth = pcCU->getDepth(0);
+	const UInt         uiInitTrDepth = pcCU->getPartitionSize(0) == SIZE_2Nx2N ? 0 : 1;
+	const UInt         uiNumPU = 1 << (2 * uiInitTrDepth);//1或者4
+	const UInt         uiQNumParts = pcCU->getTotalNumPart() >> 2;
+	const UInt         uiWidthBit = pcCU->getIntraSizeIdx(0);
+	const ChromaFormat chFmt = pcCU->getPic()->getChromaFormat();
+	const UInt         numberValidComponents = getNumberValidComponents(chFmt);
+	const TComSPS     &sps = *(pcCU->getSlice()->getSPS());
+	const TComPPS     &pps = *(pcCU->getSlice()->getPPS());
+	Distortion   uiOverallDistY = 0;
+	UInt         CandNum;
+	Double       CandCostList[FAST_UDI_MAX_RDMODE_NUM];
+	Pel          resiLumaPU[NUMBER_OF_STORED_RESIDUAL_TYPES][MAX_CU_SIZE * MAX_CU_SIZE];
+
+	Bool    bMaintainResidual[NUMBER_OF_STORED_RESIDUAL_TYPES];
+	for (UInt residualTypeIndex = 0; residualTypeIndex < NUMBER_OF_STORED_RESIDUAL_TYPES; residualTypeIndex++)
+	{
+		bMaintainResidual[residualTypeIndex] = true; //assume true unless specified otherwise
+	}
+
+	bMaintainResidual[RESIDUAL_ENCODER_SIDE] = !(m_pcEncCfg->getUseReconBasedCrossCPredictionEstimate());
+
+	// Lambda calculation at equivalent Qp of 4 is recommended because at that Qp, the quantisation divisor is 1.
+#if FULL_NBIT
+	const Double sqrtLambdaForFirstPass = (m_pcEncCfg->getCostMode() == COST_MIXED_LOSSLESS_LOSSY_CODING && pcCU->getCUTransquantBypass(0)) ?
+		sqrt(0.57 * pow(2.0, ((LOSSLESS_AND_MIXED_LOSSLESS_RD_COST_TEST_QP_PRIME - 12) / 3.0)))
+		: m_pcRdCost->getSqrtLambda();
+#else
+	const Double sqrtLambdaForFirstPass = (m_pcEncCfg->getCostMode() == COST_MIXED_LOSSLESS_LOSSY_CODING && pcCU->getCUTransquantBypass(0)) ?
+		sqrt(0.57 * pow(2.0, ((LOSSLESS_AND_MIXED_LOSSLESS_RD_COST_TEST_QP_PRIME - 12 - 6 * (sps.getBitDepth(CHANNEL_TYPE_LUMA) - 8)) / 3.0)))
+		: m_pcRdCost->getSqrtLambda();
+#endif
+
+	//===== set QP and clear Cbf =====
+	if (pps.getUseDQP() == true)
+	{
+		pcCU->setQPSubParts(pcCU->getQP(0), 0, uiDepth);
+	}
+	else
+	{
+		pcCU->setQPSubParts(pcCU->getSlice()->getSliceQp(), 0, uiDepth);
+	}
+
+	//===== loop over partitions =====用的是do while循环,主要是pu tu的循环
+	TComTURecurse tuRecurseCU(pcCU, 0);
+	TComTURecurse tuRecurseWithPU(tuRecurseCU, false, (uiInitTrDepth == 0) ? TComTU::DONT_SPLIT : TComTU::QUAD_SPLIT);
+
+	do
+	{
+		const UInt uiPartOffset = tuRecurseWithPU.GetAbsPartIdxTU();
+		//  for( UInt uiPU = 0, uiPartOffset=0; uiPU < uiNumPU; uiPU++, uiPartOffset += uiQNumParts )
+		//{
+		//===== init pattern for luma prediction =====
+		DEBUG_STRING_NEW(sTemp2)
+
+			//===== determine set of modes to be tested (using prediction signal only) =====
+			Int numModesAvailable = 35; //total number of Intra modes
+		    UInt uiRdModeList[FAST_UDI_MAX_RDMODE_NUM];
+		    Int numModesForFullRD = m_pcEncCfg->getFastUDIUseMPMEnabled() ? g_aucIntraModeNumFast_UseMPM[uiWidthBit] : g_aucIntraModeNumFast_NotUseMPM[uiWidthBit];//根据是否开通MPM来决定full rd的模式数量
+
+
+		// this should always be true
+		assert(tuRecurseWithPU.ProcessComponentSection(COMPONENT_Y));
+		initIntraPatternChType(tuRecurseWithPU, COMPONENT_Y, true DEBUG_STRING_PASS_INTO(sTemp2));
+
+		Bool doFastSearch = (numModesForFullRD != numModesAvailable);//如果两个不相等就是快速搜索
+		if (doFastSearch)//这步可能是为了用简单的哈德玛变换确定MPM的模式，初步计算cost
+		{
+			assert(numModesForFullRD < numModesAvailable);
+
+			for (Int i = 0; i < numModesForFullRD; i++)
+			{
+				CandCostList[i] = MAX_DOUBLE;
+			}
+			CandNum = 0;
+
+			const TComRectangle &puRect = tuRecurseWithPU.getRect(COMPONENT_Y);
+			const UInt uiAbsPartIdx = tuRecurseWithPU.GetAbsPartIdxTU();
+
+			Pel* piOrg = pcOrgYuv->getAddr(COMPONENT_Y, uiAbsPartIdx);
+			Pel* piPred = pcPredYuv->getAddr(COMPONENT_Y, uiAbsPartIdx);
+			UInt uiStride = pcPredYuv->getStride(COMPONENT_Y);
+			DistParam distParam;
+			const Bool bUseHadamard = pcCU->getCUTransquantBypass(0) == 0;
+			m_pcRdCost->setDistParam(distParam, sps.getBitDepth(CHANNEL_TYPE_LUMA), piOrg, uiStride, piPred, uiStride, puRect.width, puRect.height, bUseHadamard);
+			distParam.bApplyWeight = false;
+			for (Int modeIdx = 0; modeIdx < numModesAvailable; modeIdx++)
+			{
+				UInt       uiMode = modeIdx;
+				Distortion uiSad = 0;
+
+				const Bool bUseFilter = TComPrediction::filteringIntraReferenceSamples(COMPONENT_Y, uiMode, puRect.width, puRect.height, chFmt, sps.getSpsRangeExtension().getIntraSmoothingDisabledFlag());
+
+				predIntraAng(COMPONENT_Y, uiMode, piOrg, uiStride, piPred, uiStride, tuRecurseWithPU, bUseFilter, TComPrediction::UseDPCMForFirstPassIntraEstimation(tuRecurseWithPU, uiMode));
+
+				// use hadamard transform here
+				uiSad += distParam.DistFunc(&distParam);//返回的是当前模式下进行预测后，对残差进行hadamard变换后的sad值
+
+				UInt   iModeBits = 0;
+
+				// NB xModeBitsIntra will not affect the mode for chroma that may have already been pre-estimated.
+				iModeBits += xModeBitsIntra(pcCU, uiMode, uiPartOffset, uiDepth, CHANNEL_TYPE_LUMA);
+
+				Double cost = (Double)uiSad + (Double)iModeBits * sqrtLambdaForFirstPass;//计算cost J
+
+				//printf("cost = %f\n", cost);
+				std::cout << "1st pass mode " << uiMode << " SAD = " << uiSad << ", mode bits = " << iModeBits << ", cost = " << cost << ", uiDepth = " << uiDepth <<"\n";
+
+#if DEBUG_INTRA_SEARCH_COSTS
+				std::cout << "1st pass mode " << uiMode << " SAD = " << uiSad << ", mode bits = " << iModeBits << ", cost = " << cost << "\n";
+#endif
+
+				CandNum += xUpdateCandList(uiMode, cost, numModesForFullRD, uiRdModeList, CandCostList);//sad和bit虽然是加了自身，但是在循环开始进行了初始化，所以无关大碍,这里面应该是更新了，如果不需要更新就加0，需要更新就加1
+			}
+
+			if (m_pcEncCfg->getFastUDIUseMPMEnabled())//这个函数是确定最可能的模式是哪些
+			{
+				Int uiPreds[NUM_MOST_PROBABLE_MODES] = { -1, -1, -1 };//MPM的个数，初始化为-1模式
+
+				Int iMode = -1;
+				pcCU->getIntraDirPredictor(uiPartOffset, uiPreds, COMPONENT_Y, &iMode);//这里是引用传递，可以改变传入参数的值
+
+				const Int numCand = (iMode >= 0) ? iMode : Int(NUM_MOST_PROBABLE_MODES);
+
+				for (Int j = 0; j < numCand; j++)
+				{
+					Bool mostProbableModeIncluded = false;
+					Int mostProbableMode = uiPreds[j];
+
+					for (Int i = 0; i < numModesForFullRD; i++)
+					{
+						mostProbableModeIncluded |= (mostProbableMode == uiRdModeList[i]);
+					}
+					if (!mostProbableModeIncluded)
+					{
+						uiRdModeList[numModesForFullRD++] = mostProbableMode;
+					}
+				}
+			}
+		}//快速搜索结束
+		else
+		{
+			for (Int i = 0; i < numModesForFullRD; i++)
+			{
+				uiRdModeList[i] = i;
+			}
+		}
+
+		//===== check modes (using r-d costs) =====
+#if HHI_RQT_INTRA_SPEEDUP_MOD
+		UInt   uiSecondBestMode = MAX_UINT;
+		Double dSecondBestPUCost = MAX_DOUBLE;
+#endif
+		DEBUG_STRING_NEW(sPU)
+			UInt       uiBestPUMode = 0;
+		Distortion uiBestPUDistY = 0;
+		Double     dBestPUCost = MAX_DOUBLE;
+
+
+
+#if ENVIRONMENT_VARIABLE_DEBUG_AND_TEST
+		UInt max = numModesForFullRD;
+
+		if (DebugOptionList::ForceLumaMode.isSet())
+		{
+			max = 0;  // we are forcing a direction, so don't bother with mode check
+		}
+		for (UInt uiMode = 0; uiMode < max; uiMode++)
+#else
+		for (UInt uiMode = 0; uiMode < numModesForFullRD; uiMode++)
+#endif
+		{
+			// set luma prediction mode
+			UInt uiOrgMode = uiRdModeList[uiMode];
+
+			pcCU->setIntraDirSubParts(CHANNEL_TYPE_LUMA, uiOrgMode, uiPartOffset, uiDepth + uiInitTrDepth);//将当前编码cu的所有4*4的小块设置帧内预测方向
+
+			DEBUG_STRING_NEW(sMode)
+				// set context models
+				m_pcRDGoOnSbacCoder->load(m_pppcRDSbacCoder[uiDepth][CI_CURR_BEST]);
+
+			// determine residual for partition
+			Distortion uiPUDistY = 0;
+			Double     dPUCost = 0.0;
+#if HHI_RQT_INTRA_SPEEDUP
+			xRecurIntraCodingLumaQT(pcOrgYuv, pcPredYuv, pcResiYuv, resiLumaPU, uiPUDistY, true, dPUCost, tuRecurseWithPU DEBUG_STRING_PASS_INTO(sMode));
+#else
+			xRecurIntraCodingLumaQT(pcOrgYuv, pcPredYuv, pcResiYuv, resiLumaPU, uiPUDistY, dPUCost, tuRecurseWithPU DEBUG_STRING_PASS_INTO(sMode));
+#endif
+
+
+
+
+#if DEBUG_INTRA_SEARCH_COSTS
+			std::cout << "2nd pass [luma,chroma] mode [" << Int(pcCU->getIntraDir(CHANNEL_TYPE_LUMA, uiPartOffset)) << "," << Int(pcCU->getIntraDir(CHANNEL_TYPE_CHROMA, uiPartOffset)) << "] cost = " << dPUCost << "\n";
+#endif
+
+			// check r-d cost
+			if (dPUCost < dBestPUCost)//在上一个函数中，计算出了当前模式下的cost，和目前为止最优的进行比较，如果比最优的小，把相关的记录下来，不然的话计算下一个模式
+			{
+				DEBUG_STRING_SWAP(sPU, sMode)
+#if HHI_RQT_INTRA_SPEEDUP_MOD
+					uiSecondBestMode = uiBestPUMode;
+				dSecondBestPUCost = dBestPUCost;
+#endif
+				uiBestPUMode = uiOrgMode;
+				uiBestPUDistY = uiPUDistY;
+				dBestPUCost = dPUCost;
+
+				xSetIntraResultLumaQT(pcRecoYuv, tuRecurseWithPU);
+
+				if (pps.getPpsRangeExtension().getCrossComponentPredictionEnabledFlag())
+				{
+					const Int xOffset = tuRecurseWithPU.getRect(COMPONENT_Y).x0;
+					const Int yOffset = tuRecurseWithPU.getRect(COMPONENT_Y).y0;
+					for (UInt storedResidualIndex = 0; storedResidualIndex < NUMBER_OF_STORED_RESIDUAL_TYPES; storedResidualIndex++)
+					{
+						if (bMaintainResidual[storedResidualIndex])
+						{
+							xStoreCrossComponentPredictionResult(resiLuma[storedResidualIndex], resiLumaPU[storedResidualIndex], tuRecurseWithPU, xOffset, yOffset, MAX_CU_SIZE, MAX_CU_SIZE);
+						}
+					}
+				}
+
+				UInt uiQPartNum = tuRecurseWithPU.GetAbsPartIdxNumParts();
+
+				::memcpy(m_puhQTTempTrIdx, pcCU->getTransformIdx() + uiPartOffset, uiQPartNum * sizeof(UChar));
+				for (UInt component = 0; component < numberValidComponents; component++)
+				{
+					const ComponentID compID = ComponentID(component);
+					::memcpy(m_puhQTTempCbf[compID], pcCU->getCbf(compID) + uiPartOffset, uiQPartNum * sizeof(UChar));
+					::memcpy(m_puhQTTempTransformSkipFlag[compID], pcCU->getTransformSkip(compID) + uiPartOffset, uiQPartNum * sizeof(UChar));
+				}
+			}
+#if HHI_RQT_INTRA_SPEEDUP_MOD
+			else if (dPUCost < dSecondBestPUCost)
+			{
+				uiSecondBestMode = uiOrgMode;
+				dSecondBestPUCost = dPUCost;
+			}
+#endif
+		} // Mode loop
+
+		//从这之后是针对确定的最优的模式再进行一遍rdcost计算
+#if HHI_RQT_INTRA_SPEEDUP
+#if HHI_RQT_INTRA_SPEEDUP_MOD
+		for (UInt ui = 0; ui < 2; ++ui)
+#endif
+		{
+#if HHI_RQT_INTRA_SPEEDUP_MOD
+			UInt uiOrgMode = ui ? uiSecondBestMode : uiBestPUMode;
+			if (uiOrgMode == MAX_UINT)
+			{
+				break;
+			}
+#else
+			UInt uiOrgMode = uiBestPUMode;
+#endif
+
+#if ENVIRONMENT_VARIABLE_DEBUG_AND_TEST
+			if (DebugOptionList::ForceLumaMode.isSet())
+			{
+				uiOrgMode = DebugOptionList::ForceLumaMode.getInt();
+			}
+#endif
+
+			pcCU->setIntraDirSubParts(CHANNEL_TYPE_LUMA, uiOrgMode, uiPartOffset, uiDepth + uiInitTrDepth);
+			DEBUG_STRING_NEW(sModeTree)
+
+				// set context models
+				m_pcRDGoOnSbacCoder->load(m_pppcRDSbacCoder[uiDepth][CI_CURR_BEST]);
+
+			// determine residual for partition
+			Distortion uiPUDistY = 0;
+			Double     dPUCost = 0.0;
+
+			xRecurIntraCodingLumaQT(pcOrgYuv, pcPredYuv, pcResiYuv, resiLumaPU, uiPUDistY, false, dPUCost, tuRecurseWithPU DEBUG_STRING_PASS_INTO(sModeTree));//这只是改了true或false，又计算了一遍不同情况下的rdcost但是我不知道是哪种情况
+
+			// check r-d cost
+			if (dPUCost < dBestPUCost)
+			{
+				DEBUG_STRING_SWAP(sPU, sModeTree)
+					uiBestPUMode = uiOrgMode;
+				uiBestPUDistY = uiPUDistY;
+				dBestPUCost = dPUCost;
+
+				xSetIntraResultLumaQT(pcRecoYuv, tuRecurseWithPU);
+
+				if (pps.getPpsRangeExtension().getCrossComponentPredictionEnabledFlag())
+				{
+					const Int xOffset = tuRecurseWithPU.getRect(COMPONENT_Y).x0;
+					const Int yOffset = tuRecurseWithPU.getRect(COMPONENT_Y).y0;
+					for (UInt storedResidualIndex = 0; storedResidualIndex < NUMBER_OF_STORED_RESIDUAL_TYPES; storedResidualIndex++)
+					{
+						if (bMaintainResidual[storedResidualIndex])
+						{
+							xStoreCrossComponentPredictionResult(resiLuma[storedResidualIndex], resiLumaPU[storedResidualIndex], tuRecurseWithPU, xOffset, yOffset, MAX_CU_SIZE, MAX_CU_SIZE);
+						}
+					}
+				}
+
+				const UInt uiQPartNum = tuRecurseWithPU.GetAbsPartIdxNumParts();
+				::memcpy(m_puhQTTempTrIdx, pcCU->getTransformIdx() + uiPartOffset, uiQPartNum * sizeof(UChar));
+
+				for (UInt component = 0; component < numberValidComponents; component++)
+				{
+					const ComponentID compID = ComponentID(component);
+					::memcpy(m_puhQTTempCbf[compID], pcCU->getCbf(compID) + uiPartOffset, uiQPartNum * sizeof(UChar));
+					::memcpy(m_puhQTTempTransformSkipFlag[compID], pcCU->getTransformSkip(compID) + uiPartOffset, uiQPartNum * sizeof(UChar));
+				}
+			}
+		} // Mode loop
+#endif
+
+		DEBUG_STRING_APPEND(sDebug, sPU)
+
+			//--- update overall distortion ---
+			uiOverallDistY += uiBestPUDistY;//这个值初始化是在do while循环之前，随着do循环来叠加
+
+		//--- update transform index and cbf ---
+		const UInt uiQPartNum = tuRecurseWithPU.GetAbsPartIdxNumParts();
+		::memcpy(pcCU->getTransformIdx() + uiPartOffset, m_puhQTTempTrIdx, uiQPartNum * sizeof(UChar));
+		for (UInt component = 0; component < numberValidComponents; component++)
+		{
+			const ComponentID compID = ComponentID(component);
+			::memcpy(pcCU->getCbf(compID) + uiPartOffset, m_puhQTTempCbf[compID], uiQPartNum * sizeof(UChar));
+			::memcpy(pcCU->getTransformSkip(compID) + uiPartOffset, m_puhQTTempTransformSkipFlag[compID], uiQPartNum * sizeof(UChar));
+		}
+
+		//--- set reconstruction for next intra prediction blocks ---
+		if (!tuRecurseWithPU.IsLastSection())
+		{
+			const TComRectangle &puRect = tuRecurseWithPU.getRect(COMPONENT_Y);
+			const UInt  uiCompWidth = puRect.width;
+			const UInt  uiCompHeight = puRect.height;
+
+			const UInt  uiZOrder = pcCU->getZorderIdxInCtu() + uiPartOffset;
+			Pel*  piDes = pcCU->getPic()->getPicYuvRec()->getAddr(COMPONENT_Y, pcCU->getCtuRsAddr(), uiZOrder);
+			const UInt  uiDesStride = pcCU->getPic()->getPicYuvRec()->getStride(COMPONENT_Y);
+			const Pel*  piSrc = pcRecoYuv->getAddr(COMPONENT_Y, uiPartOffset);
+			const UInt  uiSrcStride = pcRecoYuv->getStride(COMPONENT_Y);
+
+			for (UInt uiY = 0; uiY < uiCompHeight; uiY++, piSrc += uiSrcStride, piDes += uiDesStride)
+			{
+				for (UInt uiX = 0; uiX < uiCompWidth; uiX++)
+				{
+					piDes[uiX] = piSrc[uiX];
+				}
+			}
+		}
+
+		//=== update PU data ====
+		pcCU->setIntraDirSubParts(CHANNEL_TYPE_LUMA, uiBestPUMode, uiPartOffset, uiDepth + uiInitTrDepth);
+	} while (tuRecurseWithPU.nextSection(tuRecurseCU));//do 循环结束
+
+
+	if (uiNumPU > 1)
+	{ // set Cbf for all blocks
+		UInt uiCombCbfY = 0;
+		UInt uiCombCbfU = 0;
+		UInt uiCombCbfV = 0;
+		UInt uiPartIdx = 0;
+		for (UInt uiPart = 0; uiPart < 4; uiPart++, uiPartIdx += uiQNumParts)
+		{
+			uiCombCbfY |= pcCU->getCbf(uiPartIdx, COMPONENT_Y, 1);
+			uiCombCbfU |= pcCU->getCbf(uiPartIdx, COMPONENT_Cb, 1);
+			uiCombCbfV |= pcCU->getCbf(uiPartIdx, COMPONENT_Cr, 1);
+		}
+		for (UInt uiOffs = 0; uiOffs < 4 * uiQNumParts; uiOffs++)
+		{
+			pcCU->getCbf(COMPONENT_Y)[uiOffs] |= uiCombCbfY;
+			pcCU->getCbf(COMPONENT_Cb)[uiOffs] |= uiCombCbfU;
+			pcCU->getCbf(COMPONENT_Cr)[uiOffs] |= uiCombCbfV;
+		}
+	}
+
+	//===== reset context models =====
+	m_pcRDGoOnSbacCoder->load(m_pppcRDSbacCoder[uiDepth][CI_CURR_BEST]);
+
+	//===== set distortion (rate and r-d costs are determined later) =====
+	pcCU->getTotalDistortion() = uiOverallDistY;//也就是有了失真，rdcost也就好算了？
+}
+
+
+
 Void
 TEncSearch::estIntraPredChromaQT(TComDataCU* pcCU,
                                  TComYuv*    pcOrgYuv,

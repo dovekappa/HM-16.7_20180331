@@ -1356,67 +1356,49 @@ Void TEncCu::xCheckRDCostIntra( TComDataCU *&rpcBestCU,
 
 	UInt uiDepth = rpcTempCU->getDepth(0);
 
-	//added by 李奕霄 20180330
-	/*
+	
+	rpcTempCU->setSkipFlagSubParts(false, 0, uiDepth);
+
+	rpcTempCU->setPartSizeSubParts(eSize, 0, uiDepth);
+	rpcTempCU->setPredModeSubParts(MODE_INTRA, 0, uiDepth);
+	rpcTempCU->setChromaQpAdjSubParts(rpcTempCU->getCUTransquantBypass(0) ? 0 : m_cuChromaQpOffsetIdxPlus1, 0, uiDepth);
+
+	Pel resiLuma[NUMBER_OF_STORED_RESIDUAL_TYPES][MAX_CU_SIZE * MAX_CU_SIZE];
+
 	if (uiDepth == 0)
 	{
-	rpcTempCU->setSkipFlagSubParts(false, 0, uiDepth);
+		m_pcPredSearch->estIntraPredLumaPlanar(rpcTempCU, m_ppcOrigYuv[uiDepth], m_ppcPredYuvTemp[uiDepth], m_ppcResiYuvTemp[uiDepth], m_ppcRecoYuvTemp[uiDepth], resiLuma DEBUG_STRING_PASS_INTO(sTest));
 
-	rpcTempCU->setPartSizeSubParts(eSize, 0, uiDepth);
-	rpcTempCU->setPredModeSubParts(MODE_INTRA, 0, uiDepth);
-	rpcTempCU->setChromaQpAdjSubParts(rpcTempCU->getCUTransquantBypass(0) ? 0 : m_cuChromaQpOffsetIdxPlus1, 0, uiDepth);
+		m_pcEntropyCoder->resetBits();//开始进行编码了
 
-	Pel resiLuma[NUMBER_OF_STORED_RESIDUAL_TYPES][MAX_CU_SIZE * MAX_CU_SIZE];
+		if (rpcTempCU->getSlice()->getPPS()->getTransquantBypassEnableFlag())
+		{
+			m_pcEntropyCoder->encodeCUTransquantBypassFlag(rpcTempCU, 0, true);//编码bypassFlag
+		}
 
-	m_pcPredSearch->estIntraPredLumaQT(1, rpcTempCU, m_ppcOrigYuv[uiDepth], m_ppcPredYuvTemp[uiDepth], m_ppcResiYuvTemp[uiDepth], m_ppcRecoYuvTemp[uiDepth], resiLuma DEBUG_STRING_PASS_INTO(sTest));
-	//从这出来以后已经找到了快速搜索模式下最小cost的对应模式，也有了失真值，都存储在了rpcTempCU里
-	m_ppcRecoYuvTemp[uiDepth]->copyToPicComponent(COMPONENT_Y, rpcTempCU->getPic()->getPicYuvRec(), rpcTempCU->getCtuRsAddr(), rpcTempCU->getZorderIdxInCtu());
+		m_pcEntropyCoder->encodeSkipFlag(rpcTempCU, 0, true);//编码skipFlag
+		m_pcEntropyCoder->encodePredMode(rpcTempCU, 0, true);//编码预测模式
+		m_pcEntropyCoder->encodePartSize(rpcTempCU, 0, uiDepth, true);//编码块大小
+		m_pcEntropyCoder->encodePredInfo(rpcTempCU, 0);//编码预测信息
+		m_pcEntropyCoder->encodeIPCMInfo(rpcTempCU, 0, true);
 
-	/*
-	if (rpcBestCU->getPic()->getChromaFormat() != CHROMA_400)//如果不是400格式，现在估计Chroma的帧内预测
-	{
-	m_pcPredSearch->estIntraPredChromaQT(rpcTempCU, m_ppcOrigYuv[uiDepth], m_ppcPredYuvTemp[uiDepth], m_ppcResiYuvTemp[uiDepth], m_ppcRecoYuvTemp[uiDepth], resiLuma DEBUG_STRING_PASS_INTO(sTest));
+		// Encode Coefficients
+		Bool bCodeDQP = getdQPFlag();
+		Bool codeChromaQpAdjFlag = getCodeChromaQpAdjFlag();
+		m_pcEntropyCoder->encodeCoeff(rpcTempCU, 0, uiDepth, bCodeDQP, codeChromaQpAdjFlag);
+		setCodeChromaQpAdjFlag(codeChromaQpAdjFlag);
+		setdQPFlag(bCodeDQP);
+
+		m_pcRDGoOnSbacCoder->store(m_pppcRDSbacCoder[uiDepth][CI_TEMP_BEST]);
+
+		rpcTempCU->getTotalBits() = m_pcEntropyCoder->getNumberOfWrittenBits();
+		rpcTempCU->getTotalBins() = ((TEncBinCABAC *)((TEncSbac*)m_pcEntropyCoder->m_pcEntropyCoderIf)->getEncBinIf())->getBinsCoded();
+		rpcTempCU->getTotalCost() = m_pcRdCost->calcRdCost(rpcTempCU->getTotalBits(), rpcTempCU->getTotalDistortion());
+
+		//printf("totalBits: %f \ntotalCost: %f \ntotalDistortion: %f \n", rpcTempCU->getTotalBits(), rpcTempCU->getTotalCost(), rpcTempCU->getTotalDistortion());
+		std::cout << "totalBits:" << rpcTempCU->getTotalBits() << ", totalCost:" << rpcTempCU->getTotalCost() << ", totalDistortion:" << rpcTempCU->getTotalDistortion() << "\n";
 	}
 
-
-
-
-	m_pcEntropyCoder->resetBits();//开始进行编码了
-
-	if (rpcTempCU->getSlice()->getPPS()->getTransquantBypassEnableFlag())
-	{
-	m_pcEntropyCoder->encodeCUTransquantBypassFlag(rpcTempCU, 0, true);//编码bypassFlag
-	}
-
-	m_pcEntropyCoder->encodeSkipFlag(rpcTempCU, 0, true);//编码skipFlag
-	m_pcEntropyCoder->encodePredMode(rpcTempCU, 0, true);//编码预测模式
-	m_pcEntropyCoder->encodePartSize(rpcTempCU, 0, uiDepth, true);//编码块大小
-	m_pcEntropyCoder->encodePredInfo(rpcTempCU, 0);//编码预测信息
-	m_pcEntropyCoder->encodeIPCMInfo(rpcTempCU, 0, true);
-
-	// Encode Coefficients
-	Bool bCodeDQP = getdQPFlag();
-	Bool codeChromaQpAdjFlag = getCodeChromaQpAdjFlag();
-	m_pcEntropyCoder->encodeCoeff(rpcTempCU, 0, uiDepth, bCodeDQP, codeChromaQpAdjFlag);
-	setCodeChromaQpAdjFlag(codeChromaQpAdjFlag);
-	setdQPFlag(bCodeDQP);
-
-	m_pcRDGoOnSbacCoder->store(m_pppcRDSbacCoder[uiDepth][CI_TEMP_BEST]);
-
-	rpcTempCU->getTotalBits() = m_pcEntropyCoder->getNumberOfWrittenBits();
-	rpcTempCU->getTotalBins() = ((TEncBinCABAC *)((TEncSbac*)m_pcEntropyCoder->m_pcEntropyCoderIf)->getEncBinIf())->getBinsCoded();
-	rpcTempCU->getTotalCost() = m_pcRdCost->calcRdCost(rpcTempCU->getTotalBits(), rpcTempCU->getTotalDistortion());
-	//printf("totalBits: %f \ntotalCost: %f \n", rpcTempCU->getTotalBits(), rpcTempCU->getTotalCost());
-	std::cout << "totalBits:" << rpcTempCU->getTotalBits() << "\ntotalCost:" << rpcTempCU->getTotalCost() << "\ntotalDistortion:" << rpcTempCU->getTotalDistortion()<<"\n";
-	}
-	*/
-	rpcTempCU->setSkipFlagSubParts(false, 0, uiDepth);
-
-	rpcTempCU->setPartSizeSubParts(eSize, 0, uiDepth);
-	rpcTempCU->setPredModeSubParts(MODE_INTRA, 0, uiDepth);
-	rpcTempCU->setChromaQpAdjSubParts(rpcTempCU->getCUTransquantBypass(0) ? 0 : m_cuChromaQpOffsetIdxPlus1, 0, uiDepth);
-
-	Pel resiLuma[NUMBER_OF_STORED_RESIDUAL_TYPES][MAX_CU_SIZE * MAX_CU_SIZE];
 
 	m_pcPredSearch->estIntraPredLumaQT(rpcTempCU, m_ppcOrigYuv[uiDepth], m_ppcPredYuvTemp[uiDepth], m_ppcResiYuvTemp[uiDepth], m_ppcRecoYuvTemp[uiDepth], resiLuma DEBUG_STRING_PASS_INTO(sTest));
 	//从这出来以后已经找到了快速搜索模式下最小cost的对应模式，也有了失真值，都存储在了rpcTempCU里

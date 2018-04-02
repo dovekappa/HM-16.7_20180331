@@ -174,6 +174,14 @@ public:
                                   Pel         resiLuma[NUMBER_OF_STORED_RESIDUAL_TYPES][MAX_CU_SIZE * MAX_CU_SIZE]
                                   DEBUG_STRING_FN_DECLARE(sDebug));
 
+  Void  estIntraPredLumaPlanar( TComDataCU* pcCU,
+	                            TComYuv*    pcOrgYuv,
+	                            TComYuv*    pcPredYuv,
+	                            TComYuv*    pcResiYuv,
+	                            TComYuv*    pcRecoYuv,
+	                            Pel         resiLuma[NUMBER_OF_STORED_RESIDUAL_TYPES][MAX_CU_SIZE * MAX_CU_SIZE]
+	                            DEBUG_STRING_FN_DECLARE(sDebug));
+
   Void  estIntraPredChromaQT    ( TComDataCU* pcCU,
                                   TComYuv*    pcOrgYuv,
                                   TComYuv*    pcPredYuv,
