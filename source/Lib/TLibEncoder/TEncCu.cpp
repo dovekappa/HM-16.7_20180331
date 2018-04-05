@@ -1369,6 +1369,10 @@ Void TEncCu::xCheckRDCostIntra( TComDataCU *&rpcBestCU,
 	{
 		m_pcPredSearch->estIntraPredLumaPlanar(rpcTempCU, m_ppcOrigYuv[uiDepth], m_ppcPredYuvTemp[uiDepth], m_ppcResiYuvTemp[uiDepth], m_ppcRecoYuvTemp[uiDepth], resiLuma DEBUG_STRING_PASS_INTO(sTest));
 
+		
+		m_ppcRecoYuvTemp[uiDepth]->copyToPicComponent(COMPONENT_Y, rpcTempCU->getPic()->getPicYuvRec(), rpcTempCU->getCtuRsAddr(), rpcTempCU->getZorderIdxInCtu());
+		
+
 		m_pcEntropyCoder->resetBits();//开始进行编码了
 
 		if (rpcTempCU->getSlice()->getPPS()->getTransquantBypassEnableFlag())
@@ -1395,8 +1399,10 @@ Void TEncCu::xCheckRDCostIntra( TComDataCU *&rpcBestCU,
 		rpcTempCU->getTotalBins() = ((TEncBinCABAC *)((TEncSbac*)m_pcEntropyCoder->m_pcEntropyCoderIf)->getEncBinIf())->getBinsCoded();
 		rpcTempCU->getTotalCost() = m_pcRdCost->calcRdCost(rpcTempCU->getTotalBits(), rpcTempCU->getTotalDistortion());
 
-		//printf("totalBits: %f \ntotalCost: %f \ntotalDistortion: %f \n", rpcTempCU->getTotalBits(), rpcTempCU->getTotalCost(), rpcTempCU->getTotalDistortion());
-		std::cout << "totalBits:" << rpcTempCU->getTotalBits() << ", totalCost:" << rpcTempCU->getTotalCost() << ", totalDistortion:" << rpcTempCU->getTotalDistortion() << "\n";
+ 		Double QP = (Double)rpcTempCU->getQP(0);
+		Double Qstep = pow(2, (QP - 4) / 6);
+		//std::cout << "totalBits:" << rpcTempCU->getTotalBits() << ", totalCost:" << rpcTempCU->getTotalCost() << ", totalDistortion:" << rpcTempCU->getTotalDistortion() << "\n";
+		std::cout << "RD/Q:" << rpcTempCU->getTotalCost() / Qstep << ", RD/D:" << rpcTempCU->getTotalCost() / rpcTempCU->getTotalDistortion() << "\n";
 	}
 
 
@@ -1439,6 +1445,8 @@ Void TEncCu::xCheckRDCostIntra( TComDataCU *&rpcBestCU,
 	rpcTempCU->getTotalCost() = m_pcRdCost->calcRdCost(rpcTempCU->getTotalBits(), rpcTempCU->getTotalDistortion());
 
 	//printf("totalBits: %f \ntotalCost: %f \ntotalDistortion: %f \n", rpcTempCU->getTotalBits(), rpcTempCU->getTotalCost(), rpcTempCU->getTotalDistortion());
+
+	//std::cout << "totalBits:" << rpcTempCU->getTotalBits() << ", totalCost:" << rpcTempCU->getTotalCost() << ", totalDistortion:" << rpcTempCU->getTotalDistortion() << "\n";
 
 	xCheckDQP(rpcTempCU);
 

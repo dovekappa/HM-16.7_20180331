@@ -77,6 +77,7 @@ Double TComRdCost::calcRdCost( Double numBits, Double distortion, DFunc eDFunc )
       break;
   }
 
+
   if (eDFunc == DF_SAD)
   {
     if (m_costMode != COST_STANDARD_LOSSY)
