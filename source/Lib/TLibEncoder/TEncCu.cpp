@@ -1402,7 +1402,7 @@ Void TEncCu::xCheckRDCostIntra( TComDataCU *&rpcBestCU,
  		Double QP = (Double)rpcTempCU->getQP(0);
 		Double Qstep = pow(2, (QP - 4) / 6);
 		//std::cout << "totalBits:" << rpcTempCU->getTotalBits() << ", totalCost:" << rpcTempCU->getTotalCost() << ", totalDistortion:" << rpcTempCU->getTotalDistortion() << "\n";
-		std::cout << "RD/Q:" << rpcTempCU->getTotalCost() / Qstep << ", RD/D:" << rpcTempCU->getTotalCost() / rpcTempCU->getTotalDistortion() << "\n";
+		std::cout << "\nRD/Q:" << rpcTempCU->getTotalCost() / Qstep << ", RD/D:" << rpcTempCU->getTotalCost() / rpcTempCU->getTotalDistortion() << "\n";
 	}
 
 

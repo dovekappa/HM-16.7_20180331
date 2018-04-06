@@ -832,6 +832,58 @@ Void TEncSlice::compressSlice( TComPic* pcPic, const Bool bCompressEntireSlice, 
 		// run CTU trial encoder
 		m_pcCuEncoder->compressCtu(pCtu);
 
+		//计算左方、上方ctu的平均RD cost
+		TComDataCU* pCtuLeft    =   pCtu->getCtuLeft();
+		TComDataCU* pCtuAbove   =   pCtu->getCtuAbove();
+
+		Double      rdcostLeftCtu     = 0;
+		Double      rdcostAboveCtu    = 0;
+		UChar*      pDepthLeftCtu     = NULL;
+		UChar*      pDepthAboveCtu    = NULL;
+		Int         sumDepthLeftCtu   = 0;
+		Int         sumDepthAboveCtu  = 0;
+
+		Double      NB_CTU_RD         = 0;
+		Int         NB_CTU_Depth      = 0;
+
+		if (pCtuLeft == NULL)
+		{
+			rdcostLeftCtu    = 0;
+			sumDepthLeftCtu  = 0;
+		}
+		else
+		{
+			rdcostLeftCtu = pCtu->getCtuLeft()->getTotalCost();
+			pDepthLeftCtu = pCtu->getCtuLeft()->getDepth();
+			for (int i = 0; i < 256; i++)
+			{
+				//std::cout << (int)pDepthLeftCtu[i] << "\n";
+				sumDepthLeftCtu += (int)pDepthLeftCtu[i];
+			}
+		}
+
+		if (pCtuAbove == NULL)
+		{
+			rdcostAboveCtu    = 0;
+			sumDepthAboveCtu  = 0;
+		}
+		else
+		{
+			rdcostAboveCtu = pCtu->getCtuAbove()->getTotalCost();
+			pDepthAboveCtu = pCtu->getCtuAbove()->getDepth();
+			for (int j = 0; j < 256; j++)
+			{
+				sumDepthAboveCtu += (int)pDepthAboveCtu[j];
+			}
+		}
+
+		NB_CTU_RD = (rdcostLeftCtu + rdcostAboveCtu) / 2;
+		NB_CTU_Depth = sumDepthLeftCtu + sumDepthAboveCtu;
+
+		std::cout<< "NB_CTU_RD:"<< NB_CTU_RD << ", NB_CTU_Depth:" << NB_CTU_Depth <<"\n";
+
+
+
 		TComPic* pPicCalledBy_pCtu = pCtu->getPic();
 		ComponentID comp = COMPONENT_Y;
 		//计算T(B)
