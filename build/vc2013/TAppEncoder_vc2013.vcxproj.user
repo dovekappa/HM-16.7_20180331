@@ -1,7 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LocalDebuggerCommandArguments>-c C:\Users\dovel\Documents\encoder_intra_main.cfg -c C:\Users\dovel\Documents\BQSquare.cfg</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-c encoder_intra_main.cfg -c BQSquare.cfg</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommand>C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\bin\vc2013\Win32\Debug\TAppEncoder.exe</LocalDebuggerCommand>
+    <LocalDebuggerWorkingDirectory>..\..\bin\vc2013\Win32\Debug</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
 </Project>

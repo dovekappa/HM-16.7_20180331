@@ -1403,6 +1403,15 @@ Void TEncCu::xCheckRDCostIntra( TComDataCU *&rpcBestCU,
 		Double Qstep = pow(2, (QP - 4) / 6);
 		//std::cout << "totalBits:" << rpcTempCU->getTotalBits() << ", totalCost:" << rpcTempCU->getTotalCost() << ", totalDistortion:" << rpcTempCU->getTotalDistortion() << "\n";
 		std::cout << "\nRD/Q:" << rpcTempCU->getTotalCost() / Qstep << ", RD/D:" << rpcTempCU->getTotalCost() / rpcTempCU->getTotalDistortion() << "\n";
+
+		ofstream outfile;
+		outfile.open("feature34.txt", ios::in | ios::out | ios::binary | ios::app);//在文件末尾继续写入时加入  | ios::app
+		if (!outfile.is_open())
+		{
+			cout << "the file open fail" << endl;
+			exit(1);
+		}
+		outfile << rpcTempCU->getTotalCost() / Qstep << "\t" << rpcTempCU->getTotalCost() / rpcTempCU->getTotalDistortion() <<  "\r\n";
 	}
 
 

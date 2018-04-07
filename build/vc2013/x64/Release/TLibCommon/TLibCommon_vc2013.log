@@ -1,0 +1,67 @@
+﻿Build started 2018/4/6 20:15:39.
+     1>Project "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\vc2013\TLibCommon_vc2013.vcxproj" on node 3 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\CL.exe /c /I"C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\..\source\Lib\\" /Zi /nologo /W3 /WX- /O2 /Ob2 /Ot /GL /D WIN32 /D _LIB /D _CRT_SECURE_NO_WARNINGS /D _MBCS /GF /Gm- /EHsc /MT /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\x64\Release\TLibCommon\\" /Fd"C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\x64\Release\TLibCommon\vc120.pdb" /Gd /TC /errorReport:prompt ..\..\source\Lib\libmd5\libmd5.c
+         libmd5.c
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\CL.exe /c /I"C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\..\source\Lib\\" /Zi /nologo /W3 /WX- /O2 /Ob2 /Ot /GL /D WIN32 /D _LIB /D _CRT_SECURE_NO_WARNINGS /D _MBCS /GF /Gm- /EHsc /MT /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\x64\Release\TLibCommon\\" /Fd"C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\x64\Release\TLibCommon\vc120.pdb" /Gd /TP /errorReport:prompt ..\..\source\Lib\TLibCommon\ContextModel.cpp ..\..\source\Lib\TLibCommon\ContextModel3DBuffer.cpp ..\..\source\Lib\TLibCommon\Debug.cpp ..\..\source\Lib\TLibCommon\SEI.cpp ..\..\source\Lib\TLibCommon\TComBitStream.cpp ..\..\source\Lib\TLibCommon\TComCABACTables.cpp ..\..\source\Lib\TLibCommon\TComChromaFormat.cpp ..\..\source\Lib\TLibCommon\TComDataCU.cpp ..\..\source\Lib\TLibCommon\TComInterpolationFilter.cpp ..\..\source\Lib\TLibCommon\TComLoopFilter.cpp ..\..\source\Lib\TLibCommon\TComMotionInfo.cpp ..\..\source\Lib\TLibCommon\TComPattern.cpp ..\..\source\Lib\TLibCommon\TComPic.cpp ..\..\source\Lib\TLibCommon\TComPicSym.cpp ..\..\source\Lib\TLibCommon\TComPicYuv.cpp ..\..\source\Lib\TLibCommon\TComPicYuvMD5.cpp ..\..\source\Lib\TLibCommon\TComPrediction.cpp ..\..\source\Lib\TLibCommon\TComRdCost.cpp ..\..\source\Lib\TLibCommon\TComRdCostWeightPrediction.cpp ..\..\source\Lib\TLibCommon\TComRom.cpp ..\..\source\Lib\TLibCommon\TComSampleAdaptiveOffset.cpp ..\..\source\Lib\TLibCommon\TComSlice.cpp ..\..\source\Lib\TLibCommon\TComTrQuant.cpp ..\..\source\Lib\TLibCommon\TComTU.cpp ..\..\source\Lib\TLibCommon\TComWeightPrediction.cpp ..\..\source\Lib\TLibCommon\TComYuv.cpp
+         ContextModel.cpp
+         ContextModel3DBuffer.cpp
+         Debug.cpp
+         SEI.cpp
+         TComBitStream.cpp
+         TComCABACTables.cpp
+         TComChromaFormat.cpp
+         TComDataCU.cpp
+         TComInterpolationFilter.cpp
+         TComLoopFilter.cpp
+         TComMotionInfo.cpp
+         TComPattern.cpp
+         TComPic.cpp
+         TComPicSym.cpp
+         TComPicYuv.cpp
+         TComPicYuvMD5.cpp
+         TComPrediction.cpp
+         TComRdCost.cpp
+         TComRdCostWeightPrediction.cpp
+         TComRom.cpp
+         Compiling...
+         TComSampleAdaptiveOffset.cpp
+         TComSlice.cpp
+         TComTrQuant.cpp
+         TComTU.cpp
+         TComWeightPrediction.cpp
+         TComYuv.cpp
+       Lib:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\Lib.exe /OUT:"C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\x64\Release\TLibCommon\TLibCommon.lib" /NOLOGO /MACHINE:X64 /LTCG "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\x64\Release\TLibCommon\libmd5.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\x64\Release\TLibCommon\ContextModel.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\x64\Release\TLibCommon\ContextModel3DBuffer.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\x64\Release\TLibCommon\Debug.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\x64\Release\TLibCommon\SEI.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\x64\Release\TLibCommon\TComBitStream.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\x64\Release\TLibCommon\TComCABACTables.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\x64\Release\TLibCommon\TComChromaFormat.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\x64\Release\TLibCommon\TComDataCU.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\x64\Release\TLibCommon\TComInterpolationFilter.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\x64\Release\TLibCommon\TComLoopFilter.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\x64\Release\TLibCommon\TComMotionInfo.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\x64\Release\TLibCommon\TComPattern.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\x64\Release\TLibCommon\TComPic.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\x64\Release\TLibCommon\TComPicSym.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\x64\Release\TLibCommon\TComPicYuv.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\x64\Release\TLibCommon\TComPicYuvMD5.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\x64\Release\TLibCommon\TComPrediction.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\x64\Release\TLibCommon\TComRdCost.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\x64\Release\TLibCommon\TComRdCostWeightPrediction.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\x64\Release\TLibCommon\TComRom.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\x64\Release\TLibCommon\TComSampleAdaptiveOffset.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\x64\Release\TLibCommon\TComSlice.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\x64\Release\TLibCommon\TComTrQuant.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\x64\Release\TLibCommon\TComTU.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\x64\Release\TLibCommon\TComWeightPrediction.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\x64\Release\TLibCommon\TComYuv.obj"
+         TLibCommon_vc2013.vcxproj -> C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\x64\Release\TLibCommon\TLibCommon.lib
+     1>Done Building Project "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\vc2013\TLibCommon_vc2013.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:24.12

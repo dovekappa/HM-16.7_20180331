@@ -1,0 +1,23 @@
+﻿Build started 2018/4/6 20:16:03.
+     1>Project "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\vc2013\TAppDecoderAnalyser_vc2013.vcxproj" on node 5 (Build target(s)).
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\CL.exe /c /I"C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\..\source\Lib\\" /Zi /nologo /W3 /WX- /O2 /Ob2 /Ot /GL /D WIN32 /D _CONSOLE /D _CRT_SECURE_NO_WARNINGS /D _MBCS /GF /Gm- /EHsc /MT /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\x64\Release\TAppDecoderAnalyser\\" /Fd"C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\x64\Release\TAppDecoderAnalyser\vc120.pdb" /Gd /TP /errorReport:prompt ..\..\source\App\TAppDecoder\decmain.cpp ..\..\source\App\TAppDecoder\TAppDecCfg.cpp ..\..\source\App\TAppDecoder\TAppDecTop.cpp
+         decmain.cpp
+         TAppDecCfg.cpp
+         TAppDecTop.cpp
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\..\bin\vc2013\x64\Release\TAppDecoderAnalyser.exe" /INCREMENTAL:NO /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\..\bin\vc2013\x64\Release\TAppDecoderAnalyser.pdb" /SUBSYSTEM:CONSOLE /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\..\bin\vc2013\x64\Release\TAppDecoderAnalyser.lib" /MACHINE:X64 "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\x64\Release\TAppDecoderAnalyser\decmain.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\x64\Release\TAppDecoderAnalyser\TAppDecCfg.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\vc2013\x64\Release\TAppDecoderAnalyser\TAppDecTop.obj"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\vc2013\x64\Release\TAppCommon\TAppCommon.lib"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\vc2013\x64\Release\TLibCommon\TLibCommon.lib"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\vc2013\x64\Release\TLibDecoderAnalyser\TLibDecoderAnalyser.lib"
+         "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\vc2013\x64\Release\TLibVideoIo\TLibVideoIO.lib"
+         Generating code
+         Finished generating code
+         TAppDecoderAnalyser_vc2013.vcxproj -> C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\\..\bin\vc2013\x64\Release\TAppDecoderAnalyser.exe
+     1>Done Building Project "C:\Users\dovel\Documents\Visual Studio 2013\Projects\HM-16.7_20180331\build\vc2013\TAppDecoderAnalyser_vc2013.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:14.39
